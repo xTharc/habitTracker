@@ -21,11 +21,13 @@ app.use(express.static("public"));
 app.use(session({
   secret: "ourLittleSecret.",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie:{_expires : (15 * 60 * 1000)}, // time im ms == 10min
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 mongoose.connect("mongodb://localhost:27017/habitDB", {useNewUrlParser: true});
 mongoose.set("useCreateIndex",true);
@@ -35,7 +37,7 @@ function daysInMonth (month, year) {
 }
 
 const userSchema = new mongoose.Schema ({
-  email: String,
+  user: String,
   password: String
 });
 userSchema.plugin(passportLocalMongoose);
@@ -52,10 +54,12 @@ passport.deserializeUser(User.deserializeUser());
 
 const userLayouts = {
   habitName: [String],
-  habitType: [String]
+  habitType: [String],
+  accountID: String
 };
 const userData = {
   inputDate: String,
+  forDate: String,
   habitName: String,
   habitData: String
 
@@ -78,6 +82,7 @@ const daysinNextMonth = daysInMonth(nextMonth, year);
 
 
 console.log(day,month,year,daysinThisMonth,daysinNextMonth);
+
 
 //-------------------------------------OUR APP----------------------------------
 var foundLayout;
@@ -133,19 +138,19 @@ app.post("/register", function(req,res){
 app.get("/home", function(req,res){
 
 if (req.isAuthenticated()){
-
-  userLay.find({}, function(err, foundLayouts){
+console.log(req.user.id);
+  userLay.findOne({accountID:req.user.id}, function(err, foundLayouts){
   if (err){
     console.log(err);
   } else {
     if (foundLayouts) {
+
       foundLayout = foundLayouts;
       // console.log("foundLayouts = " + foundLayout);
-      console.log(foundLayout.length);
-      var dolzina = foundLayout.length;
-      for (var i=0;i< dolzina ;i++){
-      };
+      console.log("what did i get ? -"+foundLayout);
+
     } else {
+      foundLayout = "";
       console.log("Ne jebe pol posto");
     }
   }
@@ -173,11 +178,26 @@ app.post("/home", function(req,res){
   var adding = req.body.habit;
   console.log(adding);
 
-  var adder = new userLay({
-    habitName: adding[0],
-    habitType: adding[1]
-  });
-  adder.save();
+userLay.findOne({accountID:req.user.id}, function(err, foundLayouts){
+if (err){
+  console.log(err);
+} else {
+  if (foundLayouts) {
+
+    userLay.updateMany( {accountID:req.user.id},{"$push":{habitName: adding[0], habitType: adding[1] }},function(err, doc) {});
+
+  } else {
+    var adder = new userLay({
+      habitName: adding[0],
+      habitType: adding[1],
+      accountID: req.user.id
+    });
+    adder.save();
+  }
+}
+});
+
+
 
   res.redirect("/");
 });

@@ -108,7 +108,7 @@
 //     vsebina+="</tr>"
 //     }
 //     vsebina += "</table>"
-console.log(foundLayoute.length);
+console.log(foundLayoute.habitName.length);
 // ---------------------------- TABELA GENERATOR -----------------
     var vsebina="";
     for (var i = 0; i < (<%=dinThisMonth%>+1); i++) {
@@ -119,17 +119,17 @@ console.log(foundLayoute.length);
       }
 
 
-        for (var j = 0; j < foundLayoute.length ; j++) {
+        for (var j = 0; j < foundLayoute.habitName.length ; j++) {
           if(i==0) {
-            vsebina += "<th>" + foundLayoute[j].habitName + "</th>";
+            vsebina += "<th>" + foundLayoute.habitName[j] + "</th>";
           }
           else if( i== <%=day%> ){
-            if(foundLayoute[j].habitType == "YesOrNo"){
-              console.log(foundLayoute[j].habitName);
-              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute[j].habitName+'"'+",1);' id='Yes"+foundLayoute[j].habitName+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute[j].habitName+'"'+",0)' id='No"+foundLayoute[j].habitName+"' type='button' name='button'>No</button>" + "</td>";
+            if(foundLayoute.habitType[j] == "YesOrNo"){
+              console.log(foundLayoute.habitName[j]);
+              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1);' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0)' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
             }
-            if(foundLayoute[j].habitType == "Numbers"){
-              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute[j].habitName+'"'+",this.value);' id='In"+foundLayoute[j].habitName+"' type='number' name='fild'> </td>";
+            if(foundLayoute.habitType[j] == "Numbers"){
+              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value);' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
             }
           }
           else {
