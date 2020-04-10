@@ -4,7 +4,7 @@
 
 <!-- <a class="btn btn-light btn-lg" href="/register" role="button">Register</a>
 <a class="btn btn-dark btn-lg" href="/login" role="button">Login</a> -->
-
+<a href="/logout">Logout</a>
 <div class="TableHolder">
   <table class="mainTable">
 
@@ -39,7 +39,7 @@
 
 <!-- <p id="infoGraber"> <%=foundLayout%></p> -->
 <div class="form" >
-  <form id="infoformo" action="/test" method="post">
+  <form id="infoformo" action="/postData" method="post">
     <input id="datain" type="text" name="habitName" >
     <input id="datain2" type="text" name="habitData" >
   </form>
@@ -50,7 +50,8 @@
 <script type="text/javascript">
 
 
-   var foundLayoute = <%- JSON.stringify(foundLayout)%>;  // $("#infoGraber").text();
+   var foundLayoute = <%- JSON.stringify(foundLayout)%>;
+   var foundUserData = <%- JSON.stringify(foundUserData)%>; // $("#infoGraber").text();
 
   // console.log("<%- JSON.stringify(foundLayout)%>");
   // Get the modal
@@ -118,19 +119,37 @@ console.log(foundLayoute.habitName.length);
         vsebina+="<tr><td>"+i+"</td>";
       }
 
-
         for (var j = 0; j < foundLayoute.habitName.length ; j++) {
           if(i==0) {
             vsebina += "<th>" + foundLayoute.habitName[j] + "</th>";
           }
           else if( i== <%=day%> ){
+         if (foundUserData != "") {
+           var check = 0;
+            for(var l = 0; l < foundLayoute.habitName.length; l++){
+                if(foundLayoute.habitName[j] == foundUserData.habitName[l] ) {
+                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>"+ foundUserData.habitData[l] +"</td>";
+                  check=1;
+                }
+            }if(check==0){
             if(foundLayoute.habitType[j] == "YesOrNo"){
               console.log(foundLayoute.habitName[j]);
               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1);' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0)' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
             }
-            if(foundLayoute.habitType[j] == "Numbers"){
+            else if(foundLayoute.habitType[j] == "Numbers"){
               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value);' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
             }
+}
+           }
+           else {
+             if(foundLayoute.habitType[j] == "YesOrNo"){
+               console.log(foundLayoute.habitName[j]);
+               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1);' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0)' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
+             }
+             else if(foundLayoute.habitType[j] == "Numbers"){
+               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value);' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
+             }
+         }
           }
           else {
               vsebina += "<td id='i"+i+"j"+(j+1)+"'>"+"</td>";

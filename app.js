@@ -57,36 +57,59 @@ const userLayouts = {
   habitType: [String],
   accountID: String
 };
-const userData = {
-  inputDate: String,
-  forDate: String,
-  habitName: String,
-  habitData: String
+const userLay = mongoose.model ("userLay", userLayouts);
+const userDatas = {
+  inputDate: [String],
+  forDay: String,
+  habitName: userLayouts.habitName,
+  habitData: [String],
+  accountID: String,
+  Notes: String
 
 };
-const userLay = mongoose.model ("userLay", userLayouts);
 
-const date = new Date();
-const day =date.getDate();
-var month = date.getMonth() + 1 ;
-var nextMonth = month + 1 ;
-var year = date.getFullYear();
-const daysinThisMonth = daysInMonth(month, year);
+const userData = mongoose.model ("userData", userDatas);
+// Global Time Variables :
+
+
+var date;
+var day;
+var month;
+var nextMonth;
+var year;
+var daysinThisMonth;
+var daysinNextMonth;
+timeUpdate();
+
+function timeUpdate() {
+ date = new Date();
+console.log("Date ="+ date);
+ day = date.getDate();
+ month = date.getMonth() + 1 ;
+nextMonth = month + 1 ;
+ year = date.getFullYear();
+ daysinThisMonth = daysInMonth(month, year);
+
 if (nextMonth>12)
 {
   year = + 1;
  nextMonth = 1;
   console.log("Pass");
 }
-const daysinNextMonth = daysInMonth(nextMonth, year);
+ daysinNextMonth = daysInMonth(nextMonth, year);
 
 
 console.log(day,month,year,daysinThisMonth,daysinNextMonth);
+}
 
+setInterval(timeUpdate, 60000);
 
 //-------------------------------------OUR APP----------------------------------
-var foundLayout;
+var foundLayout ="";
+var foundUserData="";
 var checker = 1;
+var todaysDate = (""+day+""+month+""+year+"");
+var greenLight = 0;
 
 app.get("/", function(req,res){
   if (req.isAuthenticated()){
@@ -133,7 +156,10 @@ app.post("/register", function(req,res){
   });
 });
 
-
+app.get("/logout", function(req,res){
+  req.logout();
+res.redirect("home");
+});
 
 app.get("/home", function(req,res){
 
@@ -145,7 +171,25 @@ console.log(req.user.id);
   } else {
     if (foundLayouts) {
 
+
+    userData.findOne({accountID:req.user.id,forDay:todaysDate}, function(err, foundData){
+      if(err){
+        console.log("Erro in userFoundData"+err);
+      } else {
+        if(foundData){
+          foundUserData = foundData;
+          console.log(foundData);
+        }
+        else {
+          console.log("NO DATA FOUND for today");
+          foundUserData = "";
+        }
+      }
+
+    });
+
       foundLayout = foundLayouts;
+      greenLight = 1;
       // console.log("foundLayouts = " + foundLayout);
       console.log("what did i get ? -"+foundLayout);
 
@@ -154,23 +198,53 @@ console.log(req.user.id);
       console.log("Ne jebe pol posto");
     }
   }
-  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout});
 console.log(foundLayout);
 });
+} if (greenLight == 1){
+  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData});
+}
 
-
-} else {
+else {
   res.redirect("/");
 }
 
 });
 
-app.post("/test", function(req,res){
+app.post("/postData", function(req,res){
+var adding = req.body.habit;
+var k;
+  userData.findOne({accountID:req.user.id, forDay:todaysDate}, function(err, foundSmtn){
+  if (err){
+    console.log(err);
+  } else {
+    if (foundSmtn) {
+console.log("I find something from today !!!")
+    userData.updateMany( {accountID:req.user.id},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
+
+    } else {
+      for(var i =0; i< foundLayout.length; i++) {
+        if(foundLayout.habitName[i] == req.body.habitName) {
+          k = i;
+        }
+      }
+      var adder = new userData({
+        habitName: req.body.habitName,
+        habitData: req.body.habitData,
+        accountID: req.user.id,
+        inputDate: date,
+        forDay: todaysDate
+      });
+      adder.save();
+    }
+  }
+  });
+
+
 
 
 console.log("TESTing  ->"+req.body.habitName+"  is" +req.body.habitData);
-
-
+greenLight = 0;
+res.redirect("/home");
 });
 
 
@@ -198,8 +272,8 @@ if (err){
 });
 
 
-
-  res.redirect("/");
+  greenLight = 0;
+  res.redirect("/home");
 });
 // app.get("/login", function(req,res){
 // res.render("home");
