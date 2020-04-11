@@ -22,7 +22,7 @@ app.use(session({
   secret: "ourLittleSecret.",
   resave: false,
   saveUninitialized: false,
-  cookie:{_expires : (15 * 60 * 1000)}, // time im ms == 10min
+  cookie:{_expires : (15 * 60 * 1000)}, // time im ms == 15min
 }));
 
 app.use(passport.initialize());
@@ -60,7 +60,7 @@ const userLayouts = {
 const userLay = mongoose.model ("userLay", userLayouts);
 const userDatas = {
   inputDate: [String],
-  forDay: String,
+  forDay: Object,
   habitName: userLayouts.habitName,
   habitData: [String],
   accountID: String,
@@ -108,7 +108,11 @@ setInterval(timeUpdate, 60000);
 var foundLayout ="";
 var foundUserData="";
 var checker = 1;
-var todaysDate = (""+day+""+month+""+year+"");
+var todaysDate = {
+  day: day,
+  month: month,
+  year: year
+};
 var greenLight = 0;
 
 app.get("/", function(req,res){
@@ -158,12 +162,14 @@ app.post("/register", function(req,res){
 
 app.get("/logout", function(req,res){
   req.logout();
-res.redirect("home");
+  greenLight = 0;
+res.redirect("/");
 });
 
 app.get("/home", function(req,res){
 
 if (req.isAuthenticated()){
+
 console.log(req.user.id);
   userLay.findOne({accountID:req.user.id}, function(err, foundLayouts){
   if (err){
@@ -172,7 +178,7 @@ console.log(req.user.id);
     if (foundLayouts) {
 
 
-    userData.findOne({accountID:req.user.id,forDay:todaysDate}, function(err, foundData){
+    userData.find({accountID:req.user.id, 'forDay.month': month}, function(err, foundData){
       if(err){
         console.log("Erro in userFoundData"+err);
       } else {
@@ -195,15 +201,21 @@ console.log(req.user.id);
 
     } else {
       foundLayout = "";
+      greenLight = 1;
       console.log("Ne jebe pol posto");
     }
   }
 console.log(foundLayout);
 });
-} if (greenLight == 1){
-  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData});
+}
+else {
+  res.redirect("/");
 }
 
+if (greenLight == 1){
+  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData});
+
+}
 else {
   res.redirect("/");
 }
@@ -211,35 +223,33 @@ else {
 });
 
 app.post("/postData", function(req,res){
-var adding = req.body.habit;
-var k;
-  userData.findOne({accountID:req.user.id, forDay:todaysDate}, function(err, foundSmtn){
+
+var gotDay = {
+  day: parseInt(req.body.habitDate),
+  month: month,
+  year: year
+}
+  userData.findOne({accountID:req.user.id, forDay:gotDay}, function(err, foundSmtn){
   if (err){
     console.log(err);
   } else {
     if (foundSmtn) {
 console.log("I find something from today !!!")
-    userData.updateMany( {accountID:req.user.id},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
+    userData.updateMany( {accountID:req.user.id,forDay:gotDay},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
 
     } else {
-      for(var i =0; i< foundLayout.length; i++) {
-        if(foundLayout.habitName[i] == req.body.habitName) {
-          k = i;
-        }
-      }
+
       var adder = new userData({
         habitName: req.body.habitName,
         habitData: req.body.habitData,
         accountID: req.user.id,
         inputDate: date,
-        forDay: todaysDate
+        forDay: gotDay
       });
       adder.save();
     }
   }
   });
-
-
 
 
 console.log("TESTing  ->"+req.body.habitName+"  is" +req.body.habitData);
