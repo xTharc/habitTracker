@@ -50,6 +50,7 @@
 
 <script type="text/javascript">
 
+  var adder = <%- JSON.stringify(adder)%>;
 
    var foundLayoute = <%- JSON.stringify(foundLayout)%>;
    var foundUserData = <%- JSON.stringify(foundUserData)%>; // $("#infoGraber").text();
@@ -125,13 +126,16 @@ console.log(foundLayoute.habitName.length);
             vsebina += "<th>" + foundLayoute.habitName[j] + "</th>";
           }
           else if( i== <%=day%> ){ // ZA DANAŠNJI DAN
-var chose; // DAN CHECKER
+var chose = <%=day%> ;// DAN CHECKER
 for(var a = 0; a < foundUserData.length; a++){
     if (foundUserData[a].forDay.day == <%=day%>) {
       chose = a;
+      break;
     }
+
+
 }
-         if (foundUserData != "") {
+         if (foundUserData[chose]) {
            var check = 0;
             for(var l = 0; l < foundLayoute.habitName.length; l++){
                 if(foundLayoute.habitName[j] == foundUserData[chose].habitName[l] ) {
@@ -141,20 +145,20 @@ for(var a = 0; a < foundUserData.length; a++){
             }if(check==0){
             if(foundLayoute.habitType[j] == "YesOrNo"){
               console.log(foundLayoute.habitName[j]);
-              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+");' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+")' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
+              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);' id='"+i+""+j+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
             }
             else if(foundLayoute.habitType[j] == "Numbers"){
-              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+");' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
+              vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
             }
 }
            }
            else {
              if(foundLayoute.habitType[j] == "YesOrNo"){
                console.log(foundLayoute.habitName[j]);
-               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+");' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+")' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
+               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);' id='"+i+""+j+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
              }
              else if(foundLayoute.habitType[j] == "Numbers"){
-               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+");' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
+               vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
              }
          }
           }
@@ -178,26 +182,26 @@ for(var a = 0; a < foundUserData.length; a++){
               var check = 0;
                for(var l = 0; l < foundLayoute.habitName.length; l++){
                    if(foundLayoute.habitName[j] == foundUserData[chose].habitName[l] ) {
-                     vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>"+ foundUserData[chose].habitData[l] +"</td>";
+                     vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>"+ foundUserData[chose].habitData[l] +"</td>";
                      check=1;
                    }
                }if(check==0){
                if(foundLayoute.habitType[j] == "YesOrNo"){
                  console.log(foundLayoute.habitName[j]);
-                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+");' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+")' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
+                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' id='"+i+""+j+"' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);'  type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
                }
                else if(foundLayoute.habitType[j] == "Numbers"){
-                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+");' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
+                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
                }
    }
               }
               else {
                 if(foundLayoute.habitType[j] == "YesOrNo"){
                   console.log(foundLayoute.habitName[j]);
-                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+");' id='Yes"+foundLayoute.habitName[j]+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+")' id='No"+foundLayoute.habitName[j]+"' type='button' name='button'>No</button>" + "</td>";
+                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);' id='"+i+""+j+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
                 }
                 else if(foundLayoute.habitType[j] == "Numbers"){
-                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='today'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+");' id='In"+foundLayoute.habitName[j]+"' type='number' name='fild'> </td>";
+                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
                 }
             }
 
@@ -215,8 +219,22 @@ vsebina += "</tr>";
   $(".mainTable").append(vsebina);
 // ------------------------------------ KONEC TABELE GENERATORA-------------------
 //------------------------------CLICK CHECK---------------------------------------
+var iN;
+var jN;
 
-function clicked(x,y,z) {
+function clicked(x,y,z,k) {
+
+var id = $(k).attr('id');
+if (id[2]){ // ONLY CHECKS FOR MONTHS UP TO 10
+  iN = id[0];
+  iN += id[1];
+  jN = id[2];
+  console.log(iN+" TE ASTLEAZGTLADKL")
+} else {
+  iN = id[0];
+  jN = id[1];
+}
+console.log(id+"This is The ID <---");
 
   console.log(x+"   toley");
   $("#datain").val(x);
@@ -225,15 +243,77 @@ function clicked(x,y,z) {
   $("#infoformo").submit();
 };
 
-function numInputed(x,y,z){
+  $('#infoformo').on('submit', function (event) {
+    event.preventDefault(); // Stop the form from causing a page refresh.
+    var data = {
+         habitName: $('#datain').val(),
+         habitData: $('#datain2').val(),
+         habitDate: $('#datain3').val()
+       };
+    $.ajax({
+      url: '/postData',
+      data: data,
+      method: 'POST'
+    })
+    .then(function (response) {
+      getNewData();
+      console.log("I should be caaling the proper function");
+    })
+    .catch(function (err) {
+      console.error(err);
+    });
+  });
+
+
+function numInputed(x,y,z,k){
+  var id = $(k).attr('id');
+  if (id[2]){ // ONLY CHECKS FOR MONTHS UP TO 10
+    iN = id[0];
+    iN += id[1];
+    jN = id[2];
+    console.log(iN+" TE ASTLEAZGTLADKL")
+  } else {
+    iN = id[0];
+    jN = id[1];
+  }
 $("#datain").val(x);
  console.log(y);
 $("#datain2").val(y);
 $("#datain3").val(z);
 $("#infoformo").submit();
+}
+  function getNewData()
+  {
+    // Pass some identifier to use for your database
+    console.log("I got into return function");
+      $.ajax({
+        type: 'GET',
+        url: "/FetchData",
+        success: function(data) {
+          jN = parseInt(jN);
+          jN++ ;
+          // Update the element - easiet is to use EJS to make sure each house has an id/class with the id in it
+          // Given an ID of 2 this says find the div with class house_2 and updates its div with class room to the number of rooms
+          console.log("I IS"+iN+"AND J IS"+jN);
+          adder = JSON.stringify(data.adder);
+          console.log("I got This back:"+ adder.habitData);
+          console.log("TARGETERD ID IS"+ "#i"+iN+"j"+jN);
+          if (data.adder.hasOwnProperty("habitData")){
+            if(iN == <%=day%>){
+            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='today'>"+data.adder.habitData+"</td>");
+          } else {
+            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='beforeToday'>"+data.adder.habitData+"</td>");
 
+          }
+}
+      }});
 }
 
+// function replaceValues() {
+//   $("#i"+iN+"j"+jN+").replaceWith(""+adder.habitData+"");
+//   // i"+i+"j"+(j+1)+"
+//
+// }
   // for (var i=0 ; i < <%=dinThisMonth%> ; i++ ) {
   //
   // $(".mainTable").append("<tr><th id='h"+i+"'>"+i+"</th></tr>");

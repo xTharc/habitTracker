@@ -8,7 +8,7 @@ const _ = require("lodash");
 const session = require('express-session');
 const passport = require('passport');
 var passportLocalMongoose = require("passport-local-mongoose");
-
+var pjax    = require('express-pjax');
 
 const app = express();
 const ejsLint = require('ejs-lint');
@@ -16,6 +16,7 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
+app.use(pjax());
 
 // important place above mongo connection and after use passport
 app.use(session({
@@ -114,6 +115,7 @@ var todaysDate = {
   year: year
 };
 var greenLight = 0;
+var adding;
 
 app.get("/", function(req,res){
   if (req.isAuthenticated()){
@@ -213,7 +215,7 @@ else {
 }
 
 if (greenLight == 1){
-  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData});
+  res.render("index",{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData, adder: ""});
 
 }
 else {
@@ -223,7 +225,7 @@ else {
 });
 
 app.post("/postData", function(req,res){
-
+var adder;
 var gotDay = {
   day: parseInt(req.body.habitDate),
   month: month,
@@ -234,10 +236,23 @@ var gotDay = {
     console.log(err);
   } else {
     if (foundSmtn) {
-console.log("I find something from today !!!")
+      adding = {
+        habitName: req.body.habitName,
+        habitData: req.body.habitData,
+        accountID: req.user.id,
+        inputDate: date,
+        forDay: gotDay
+      };
     userData.updateMany( {accountID:req.user.id,forDay:gotDay},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
 
     } else {
+      adding = {
+        habitName: req.body.habitName,
+        habitData: req.body.habitData,
+        accountID: req.user.id,
+        inputDate: date,
+        forDay: gotDay
+      };
 
       var adder = new userData({
         habitName: req.body.habitName,
@@ -249,12 +264,16 @@ console.log("I find something from today !!!")
       adder.save();
     }
   }
+
   });
 
 
 console.log("TESTing  ->"+req.body.habitName+"  is" +req.body.habitData);
 greenLight = 0;
-res.redirect("/home");
+// res.redirect("/FetchData");
+//res.renderPjax("index" ,{day: day,dinThisMonth: daysinThisMonth,dinNextMonth:daysinNextMonth,foundLayout: foundLayout, foundUserData:foundUserData, adder: ""});
+ res.status(201);
+ res.json({});
 });
 
 
@@ -271,7 +290,7 @@ if (err){
     userLay.updateMany( {accountID:req.user.id},{"$push":{habitName: adding[0], habitType: adding[1] }},function(err, doc) {});
 
   } else {
-    var adder = new userLay({
+     adder = new userLay({
       habitName: adding[0],
       habitType: adding[1],
       accountID: req.user.id
@@ -289,7 +308,14 @@ if (err){
 // res.render("home");
 // });
 
+app.get("/FetchData",  function (req, res) {
 
+  // Return the data
+  console.log(adding);
+  res.json({
+    adder: adding
+  });
+});
 
 
 
