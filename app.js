@@ -243,8 +243,27 @@ var gotDay = {
         inputDate: date,
         forDay: gotDay
       };
-    userData.updateMany( {accountID:req.user.id,forDay:gotDay},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
-
+      var foundCheck = 0;
+      console.log("REEQ BODY NAME Is"+adding.habitName);
+      console.log(foundSmtn.habitName+" I Succesfuly located an existing data document");
+      for (var i=0;i < foundSmtn.habitName.length; i++){
+          if (req.body.habitName ==foundSmtn.habitName[i]){
+            console.log(parseInt(req.body.habitDate)+"-----------------------------------------------------------!!1");
+            var newTData = "habitData."+i;
+            var newTInput = "inputDate."+i;
+            userData.updateOne( {accountID:req.user.id,forDay:gotDay},{"$set":{[newTData]: req.body.habitData, [newTInput]: date}},function(err, doc) {
+              if (err){
+                console.log(err+" this is why its failing");
+              }
+            });
+            foundCheck = 1;
+            break;
+          }
+      }
+    if (foundCheck == 0){
+      console.log("I NEVER MADE IT TO THE PROBER PLACE")
+    userData.updateOne( {accountID:req.user.id,forDay:gotDay},{"$push":{habitName: req.body.habitName, habitData: req.body.habitData, inputDate: date}},function(err, doc) {});
+};
     } else {
       adding = {
         habitName: req.body.habitName,

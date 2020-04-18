@@ -113,6 +113,8 @@
 //     vsebina += "</table>"
 console.log(foundLayoute.habitName.length);
 // ---------------------------- TABELA GENERATOR -----------------
+    var typeSelector = [];
+    var habitSelector = [];
     var vsebina="";
     for (var i = 0; i < (<%=dinThisMonth%>+1); i++) {
       if (i == <%=day%>) {
@@ -124,6 +126,13 @@ console.log(foundLayoute.habitName.length);
         for (var j = 0; j < foundLayoute.habitName.length ; j++) {
           if(i==0) {
             vsebina += "<th>" + foundLayoute.habitName[j] + "</th>";
+            habitSelector[j+1] = foundLayoute.habitName[j];
+            if (foundLayoute.habitType[j] =="Numbers") {
+              typeSelector[j+1]="Num";
+            };
+             if (foundLayoute.habitType[j]=="YesOrNo") {
+              typeSelector[j+1]="YorN";
+            };
           }
           else if( i== <%=day%> ){ // ZA DANAŠNJI DAN
 var chose = <%=day%> ;// DAN CHECKER
@@ -182,26 +191,26 @@ for(var a = 0; a < foundUserData.length; a++){
               var check = 0;
                for(var l = 0; l < foundLayoute.habitName.length; l++){
                    if(foundLayoute.habitName[j] == foundUserData[chose].habitName[l] ) {
-                     vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>"+ foundUserData[chose].habitData[l] +"</td>";
+                     vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>"+ foundUserData[chose].habitData[l] +"<button class='Info' id='"+i+""+j+"' onclick='fixInput(this);'  type='button' name='button'>fix</button></td>";
                      check=1;
                    }
                }if(check==0){
                if(foundLayoute.habitType[j] == "YesOrNo"){
                  console.log(foundLayoute.habitName[j]);
-                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' id='"+i+""+j+"' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);'  type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
+                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' id='"+i+""+j+"' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this,111);'  type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this,111)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
                }
                else if(foundLayoute.habitType[j] == "Numbers"){
-                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
+                 vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this,222);' id='"+i+""+j+"' type='number' name='fild'> </td>";
                }
    }
               }
               else {
                 if(foundLayoute.habitType[j] == "YesOrNo"){
                   console.log(foundLayoute.habitName[j]);
-                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this);' id='"+i+""+j+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
+                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",1,"+i+",this,111);' id='"+i+""+j+"' type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+foundLayoute.habitName[j]+'"'+",0,"+i+",this,111)' id='"+i+""+j+"' type='button' name='button'>No</button>" + "</td>";
                 }
                 else if(foundLayoute.habitType[j] == "Numbers"){
-                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this);' id='"+i+""+j+"' type='number' name='fild'> </td>";
+                  vsebina += "<td id='i"+i+"j"+(j+1)+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+foundLayoute.habitName[j]+'"'+",this.value,"+i+",this,222);' id='"+i+""+j+"' type='number' name='fild'> </td>";
                 }
             }
 
@@ -222,8 +231,8 @@ vsebina += "</tr>";
 var iN;
 var jN;
 
-function clicked(x,y,z,k) {
-
+function clicked(x,y,z,k,l) {
+  console.log(l+" THIS IS TEEST FOR FUNCTION");
 var id = $(k).attr('id');
 if (id[2]){ // ONLY CHECKS FOR MONTHS UP TO 10
   iN = id[0];
@@ -296,17 +305,50 @@ $("#infoformo").submit();
           // Given an ID of 2 this says find the div with class house_2 and updates its div with class room to the number of rooms
           console.log("I IS"+iN+"AND J IS"+jN);
           adder = JSON.stringify(data.adder);
-          console.log("I got This back:"+ adder.habitData);
+          console.log("I got This back:"+ data.adder.habitData);
           console.log("TARGETERD ID IS"+ "#i"+iN+"j"+jN);
           if (data.adder.hasOwnProperty("habitData")){
             if(iN == <%=day%>){
-            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='today'>"+data.adder.habitData+"</td>");
+            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='today'>"+data.adder.habitData+"<button class='Info' id='"+iN+""+jN+"' onclick='fixInput(this,1);'  type='button' name='button'>fix</button></td>");
           } else {
-            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='beforeToday'>"+data.adder.habitData+"</td>");
+            $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='beforeToday'>"+data.adder.habitData+"<button class='Info' id='"+iN+""+jN+"' onclick='fixInput(this,1);'  type='button' name='button'>fix</button></td>");
 
           }
 }
       }});
+}
+
+function fixInput(k,h) {
+  var id = $(k).attr('id');
+  console.log("I GET THIS AS ID: "+id);
+// if(id[1]) {
+//
+// }
+// else if(id[2]){}
+//
+//
+  if (id[2]){ // ONLY CHECKS FOR MONTHS UP TO 10
+    iN = id[0];
+    iN += id[1];
+    jN = id[2];
+  } else {
+    iN = id[0];
+    jN = id[1];
+  }
+  jN = parseInt(jN);
+  jN++;
+  if(h==1){
+    jN--;
+  }
+    console.log(iN+" AND "+jN+" TESTING THIS in Fix INPUT")
+    console.log(typeSelector);
+ if (typeSelector[jN] == "YorN") {
+   console.log("Im inside if YorN");
+  $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='beforeToday'>" + "<button class='Info' id='"+iN+""+(jN-1)+"' onclick='clicked("+'"'+habitSelector[jN]+'"'+",1,"+iN+",this,111);'  type='button' name='button'>Yes</button>"+"<button class='Info' onclick='clicked("+'"'+habitSelector[jN]+'"'+",0,"+iN+",this,111)' id='"+iN+""+(jN-1)+"' type='button' name='button'>No</button>" + "</td>");
+}; if (typeSelector[jN] == "Num"){
+  console.log("Im inside if Num");
+  $("#i"+iN+"j"+jN).replaceWith("<td id='i"+iN+"j"+jN+"' class='beforeToday'>" + "<input class='Info' onfocusout='numInputed("+'"'+habitSelector[jN]+'"'+",this.value,"+iN+",this,222);' id='"+iN+""+(jN-1)+"' type='number' name='fild'>" + "</td>");
+};
 }
 
 // function replaceValues() {
